@@ -53,9 +53,9 @@ $(document).ready(function() {
   $sidebar = $('.sidebar');
   window_width = $(window).width();
 
-  $('body').bootstrapMaterialDesign({
+  /*$('body').bootstrapMaterialDesign({
     autofill: false
-  });
+  });*/
 
   md.initSidebarsCheck();
 

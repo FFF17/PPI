@@ -52,7 +52,6 @@ class Register extends CI_Controller {
             //die($this->upload->display_errors());
         }
 
-
         $data["provinsi"] = $this->input->post("provinsi");
         $data["kabupaten_kota"] = $this->input->post("kabupaten_kota");
         $data["nama"] = $this->input->post("nama");

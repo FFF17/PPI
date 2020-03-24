@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>HANURA2020</title>
+    <title>HANURA KTA</title>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
@@ -32,7 +32,7 @@
             <div class="sidebar-wrapper">
                 <div class="user">
                     <div class="photo">
-                        <img src="assets/img/user.png">
+                        <img src="<?php echo base_url() ?>assets/img/user.png">
                     </div>
                     <!-- Informasi User -->
                     <div class="user-info">
@@ -50,118 +50,16 @@
                             <p>DASHBOARD</p>
                         </a>
                     </li>
-                    <?php if ($this->session->role == "admin" || $this->session->role == "user") : ?>
-                        <li class="nav-item" name="menu" id="sk" onclick="selectMenu(this.id);goMenu('SK','sk')">
-                            <a class="nav-link" href="#0">
-                                <i class="material-icons text-success">library_books</i>
-                                <p>SK</p>
-                            </a>
-                        </li>
-                    <?php endif; ?>
-                    <?php if ($this->session->role == "admin" || $this->session->role == "user") : ?>
-                        <li class="nav-item" name="menu" id="sr" onclick="selectMenu(this.id);goMenu('Surat Rekomendasi','sr')">
-                            <a class="nav-link" href="#0">
-                                <i class="material-icons text-success">library_books</i>
-                                <p>SURAT REKOMENDASI</p>
-                            </a>
-                        </li>
-                    <?php endif; ?>
-                    <li class="nav-item" name="menu" id="asset">
-                        <a class="nav-link" data-toggle="collapse" href="#menuCalon" aria-expanded="false">
-                            <i class="material-icons text-info">folder</i>
-                            <p>CALON KEPALA DAERAH<b class="caret"></b></p>
+                    <li class="nav-item" name="menu" id="anggota_new" onclick="selectMenu(this.id);goMenu('Anggota Baru','anggota/baru')">
+                        <a class="nav-link" href="#0">
+                            <i class="material-icons text-primary">account_circle</i>
+                            <p>ANGGOTA</p>
                         </a>
-                        <div class="collapse" id="menuCalon">
-                            <ul class="nav">
-                                <li class="nav-item" name="menu" id="calon_pendaftar" onclick="selectMenu(this.id);goMenu('LIST PENDAFTARAN CALON KEPALAH DAERAH','calon/pendaftar')">
-                                    <a class="nav-link" href="#">
-                                        <span class="sidebar-mini"><i class="material-icons text-success">playlist_add_check</i> </span>
-                                        <span class="sidebar-normal">PENDAFTARAN </span>
-                                    </a>
-                                </li>
-                                <?php if ($this->session->role == "admin" || $this->session->role == "tpp" || $this->session->role == "user") : ?>
-                                    <li class="nav-item" name="menu" id="calon_profiling" onclick="selectMenu(this.id);goMenu('PROFILING CALON KEPALAH DAERAH','calon/profiling')">
-                                        <a class="nav-link" href="#">
-                                            <span class="sidebar-mini"><i class="material-icons text-success">playlist_add_check</i> </span>
-                                            <span class="sidebar-normal">PROFILING </span>
-                                        </a>
-                                    </li>
-                                <?php endif; ?>
-                                <?php if ($this->session->role == "admin" || $this->session->role == "tpp" || $this->session->role == "user") : ?>
-                                    <li class="nav-item" name="menu" id="calon_survey" onclick="selectMenu(this.id);goMenu('SURVEY','calon/survey')">
-                                        <a class="nav-link" href="#">
-                                            <span class="sidebar-mini"><i class="material-icons text-success">playlist_add_check</i> </span>
-                                            <span class="sidebar-normal">SURVEY </span>
-                                        </a>
-                                    </li>
-                                <?php endif; ?>
-                                <?php if ($this->session->role == "admin") : ?>
-                                    <li class="nav-item" name="menu" id="calon_penilaian" onclick="selectMenu(this.id);goMenu('PENILAIAN','calon/penilaian')">
-                                        <a class="nav-link" href="#">
-                                            <span class="sidebar-mini"><i class="material-icons text-success">playlist_add_check</i> </span>
-                                            <span class="sidebar-normal">PENILAIAN </span>
-                                        </a>
-                                    </li>
-                                <?php endif; ?>
-                                <?php if ($this->session->role == "admin" || $this->session->role == "user") : ?>
-                                    <li class="nav-item" name="menu" id="calon_dokumen" onclick="selectMenu(this.id);goMenu('DOKUMEN','calon/dokumen')">
-                                        <a class="nav-link" href="#">
-                                            <span class="sidebar-mini"><i class="material-icons text-success">playlist_add_check</i> </span>
-                                            <span class="sidebar-normal">KELENGKAPAN DOKUMEN </span>
-                                        </a>
-                                    </li>
-                                <?php endif; ?>
-                                <?php if ($this->session->role == "admin" || $this->session->role == "user" || $this->session->role == "sk") : ?>
-                                    <li class="nav-item" name="menu" id="surat_tugas" onclick="selectMenu(this.id);goMenu('SURAT TUGAS','calon/surat_tugas')">
-                                        <a class="nav-link" href="#">
-                                            <span class="sidebar-mini"><i class="material-icons text-success">playlist_add_check</i> </span>
-                                            <span class="sidebar-normal">SURAT TUGAS </span>
-                                        </a>
-                                    </li>
-                                <?php endif; ?>
-                            </ul>
-                        </div>
                     </li>
-                    <?php if ($this->session->role == "admin") : ?>
-                        <li class="nav-item" name="menu" id="locations">
-                            <a class="nav-link" data-toggle="collapse" href="#menuLocations" aria-expanded="false">
-                                <i class="material-icons text-info">folder</i>
-                                <p>MASTER DATA<b class="caret"></b></p>
-                            </a>
-                            <div class="collapse" id="menuLocations">
-                                <ul class="nav">
-                                    <li class="nav-item" name="menu" id="users" onclick="selectMenu(this.id);goMenu('Users','users')">
-                                        <a class="nav-link" href="#">
-                                            <span class="sidebar-mini"><i class="fa fa-user text-success"></i> </span>
-                                            <span class="sidebar-normal">USER </span>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item" name="menu" id="document" onclick="selectMenu(this.id);goMenu('Document','document')">
-                                        <a class="nav-link" href="#">
-                                            <span class="sidebar-mini"><i class="fa fa-book text-success"></i> </span>
-                                            <span class="sidebar-normal">DOKUMEN </span>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item" name="menu" id="scoring" onclick="selectMenu(this.id);goMenu('Scoring Item','scoring')">
-                                        <a class="nav-link" href="#">
-                                            <span class="sidebar-mini"><i class="fa fa-check text-success"></i> </span>
-                                            <span class="sidebar-normal">PENILAIAN </span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        <li class="nav-item" name="menu" id="report" onclick="selectMenu(this.id);goMenu('Report','report')">
-                            <a class="nav-link" href="#0">
-                                <i class="material-icons text-success">library_books</i>
-                                <p>REPORT</p>
-                            </a>
-                        </li>
-                    <?php endif; ?>
-                    <li class="nav-item " name="menu" id="logout">
-                        <a class="nav-link" href="#" onclick="logout()">
+                    <li class="nav-item" name="menu" id="logout" onclick="selectMenu(this.id);logout()">
+                        <a class="nav-link" href="#0">
                             <i class="material-icons text-danger">power_settings_new</i>
-                            <p>Log Out</p>
+                            <p>LOGOUT</p>
                         </a>
                     </li>
                 </ul>
@@ -273,7 +171,7 @@
 <script src="<?php echo base_url() ?>assets/js/plugins/bootstrap-notify.js"></script>
 
 <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
-<script src="<?php echo base_url() ?>assets/js/material-dashboard.min.js?v=2.1.1" type="text/javascript"></script>
+<script src="<?php echo base_url() ?>assets/js/material-dashboard.js?v=2.1.1" type="text/javascript"></script>
 
 <script src="<?php echo base_url() ?>assets/js/plugins/select2/dist/js/select2.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
@@ -292,7 +190,7 @@
         <?php
             $this->session->set_userdata("page", "");
         else : ?>
-            goMenu('Dashboard', 'dashboard/admin');
+            // goMenu('Dashboard', 'dashboard/admin');
         <?php endif; ?>
         <?php if ($this->session->msg != "") : ?>Swal.fire({
             html: $this - > session - > msg,
