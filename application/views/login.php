@@ -6,7 +6,7 @@
   <link rel="icon" type="image/png" href="assets/img/favicon.png">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <title>
-    HANURA2020
+PPI
   </title>
   <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport' />
   <!-- Extra details for Live View on GitHub Pages -->
@@ -77,7 +77,7 @@
               <div class="card card-login card-hidden">
                 <div class="card-header card-header-icon card-header-info">
                     <div class="card-icon">
-                        <img src="<?php echo base_url()?>assets/img/cropped_hanura.png" width="40px" />
+                        <img src="<?php echo base_url()?>assets/img/PPI.png" width="40px" />
                     </div>
                 </div>
                 <div class="card-body ">

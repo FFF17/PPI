@@ -1,592 +1,161 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-
 class Register extends CI_Controller {
+   
+    function index(){
+    $data["prov"] = $this->db->get("provinsi");
+        $this->load->view('register', $data);
+    }
 
-	/**
-	 * Index Page for this controller.
-	 *
-	 * Maps to the following URL
-	 * 		http://example.com/index.php/welcome
-	 *	- or -
-	 * 		http://example.com/index.php/welcome/index
-	 *	- or -
-	 * Since this controller is set as the default controller in
-	 * config/routes.php, it's displayed at http://example.com/
-	 *
-	 * So any other public methods not prefixed with an underscore will
-	 * map to /index.php/welcome/<method_name>
-	 * @see https://codeigniter.com/user_guide/general/urls.html
-	 */
-    public function index()
-    {
-        $data["prov"] = $this->db->query("select distinct m_geo_prov_kpu.* from m_geo_prov_kpu inner join tb_grade on tb_grade.geo_prov_id = m_geo_prov_kpu.geo_prov_id");
-        $this->load->view('register',$data);
-    }
-    public function jsom_provinsi(){
-        $data = $this->db->query("select distinct m_geo_prov_kpu.* from m_geo_prov_kpu inner join tb_grade on tb_grade.geo_prov_id = m_geo_prov_kpu.geo_prov_id");
-        echo json_encode($data->result());
-    }
-    public function jsom_kabupaten(){
-        $data = $this->db->query("select distinct m_geo_kab_kpu.* from m_geo_kab_kpu inner join tb_grade on tb_grade.geo_kab_id = m_geo_kab_kpu.geo_kab_id where tb_grade.geo_prov_id = '".$this->input->get("id")."' order by geo_kab_id asc");
-        echo json_encode($data->result());
-    }
-    public function tambah_calon(){        
-        $data["prov"] = $this->db->query("select distinct m_geo_prov_kpu.* from m_geo_prov_kpu inner join tb_grade on tb_grade.geo_prov_id = m_geo_prov_kpu.geo_prov_id");
-        $this->load->view('tambah_calon',$data);
-    }
-    public function save(){
-        $data["foto"] = $this->input->post("foto");
+    function add_new(){
 
-        $config['upload_path']          = './foto/';
-        $config['file_name']            = $this->input->post("nomor_nik");
-        $config['overwrite']			= true;
-        $config['allowed_types']        = 'gif|jpg|png';
-        // $config['max_width']            = 1024;
-        // $config['max_height']           = 768;
-        $this->load->library('upload', $config);
 
-        if ($this->upload->do_upload('foto')) {
-            $data["foto"] = $this->upload->data("file_name");
+    }
+    function check_nik(){
+        $nomor_nik = $this->input->post("nik");
+        $data = $this->db->query("select kode_anggota, tgl_lhr,tmp_lhr,agama,concat(alamat,' rt ',rt,' rw ',rw,' ',kelurahan.kelurahan,' ', kecamatan.kecamatan,' ',kabupaten.kabupaten,' ',provinsi.provinsi) alamat, pendidikan,pekerjaan,pernikahan,jk,organisasi1 from anggota
+        inner join kelurahan on kelurahan.kode = anggota.almt_kelurahan
+        inner join kecamatan on kecamatan.kode = anggota.almt_kecamatan
+        inner join kabupaten on kabupaten.kode = anggota.almt_kabupaten
+        inner join provinsi on provinsi.kode = anggota.almt_provinsi
+        where ktp = '".$nomor_nik."'")->row();
+        //var_dump($data);
+        echo json_encode($data);
+    }
+ function get_kabupaten(){
+        $geo_prov_id = $this->input->post("geo_prov_id");
+        $kab = (null !== $this->input->post('kab_selected'))?$this->input->post('kab_selected'):null;
+        $this->db->where("provinsi",$geo_prov_id);
+        $data = $this->db->get("kabupaten");
+        echo "<option value='' disabled selected>Pilih kabupaten</option>";
+        foreach($data->result() as $tmp){
+            if($kab != null && $tmp->kabupaten == $kab){
+                echo "<option value = '".$tmp->kode."' selected>".$tmp->kabupaten."</option>";
+            }else{
+                echo "<option value = '".$tmp->kode."' >".$tmp->kabupaten."</option>";
+            }
+        }
+    }
+    function get_kecamatan(){
+        $geo_kab_id = $this->input->post("geo_kab_id");
+        $this->db->where("kabupaten",$geo_kab_id);
+        $data = $this->db->get("kecamatan");
+        echo "<option value='' disabled selected>Pilih kecamatan</option>";
+        foreach($data->result() as $tmp){
+            echo "<option value = '".$tmp->kode."' >".$tmp->kecamatan."</option>";
+        }
+    }
+    function get_kelurahan(){
+        $geo_kec_id = $this->input->post("geo_kec_id");
+        $this->db->where("kecamatan",$geo_kec_id);
+        $data = $this->db->get("kelurahan");
+        echo "<option value='' disabled selected>Pilih kelurahan</option>";
+        foreach($data->result() as $tmp){
+            echo "<option value = '".$tmp->kode."' >".$tmp->kelurahan."</option>";
+        }
+    }
+      function save(){
+            $this->load->helper('string');
+            $this->load->library('form_validation');
+            $this->form_validation->set_message('is_unique', '%s is already taken');
+
+                        $this->form_validation->set_rules('nomor_telpn', 'Nomor Telepon','required|is_unique[m_anggota.nomor_telpn]');
+ if ($this->form_validation->run()) {
+                
+    
+            $data['foto_ktp'] = $this->input->post('ktp_file_name');
+            $data['nma_dpn'] = $this->input->post('nma_dpn');
+            $data['nma_blkng'] = $this->input->post('nma_blkng');
+            $data['nama'] = $this->input->post('nma_dpn')." ".$this->input->post('nma_blkng');
+
+
+            $data["nomor_ktp"] = $this->input->post("nomor_ktp");
+            $data["nomor_telpn"] = $this->input->post("nomor_telpn");
+            $data["tempat_lahir"] = $this->input->post("tempat_lahir");
+            $data["tanggal_lahir"] = $this->input->post("tanggal_lahir");
+            $data["alamat"] = $this->input->post("alamat");
+            $data["agama"] = $this->input->post("agama");
+            $data["email"] = $this->input->post("email");
+            $data["status_perkawinan"] = $this->input->post("status_perkawinan");
+            $data["jenis_kelamin"] = $this->input->post("jenis_kelamin");
+            $data["rt"] = $this->input->post("rt");
+            $data["rw"] = $this->input->post("rw");
+            $data["input_status"] = "0";
+            $data["register_date"] = date("y-m-d");
+
+            $provinsi = $this->input->post("provinsi");
+
+            $data["provinsi"] = $this->db->where("kode",$this->input->post("provinsi"))->get("provinsi")->row()->provinsi;
+            $data["kabupaten"] = $this->db->where("kode",$this->input->post("kabupaten"))->get("kabupaten")->row()->kabupaten;
+            $data["kecamatan"] = $this->db->where("kode",$this->input->post("kecamatan"))->get("kecamatan")->row()->kecamatan;
+            $data["kelurahan"] = $this->db->where("kode",$this->input->post("kelurahan"))->get("kelurahan")->row()->kelurahan;
+            if(null === $this->input->post('nomor_anggota') || $this->input->post('nomor_anggota') == ""){
+                $last = 0;
+                $this->db->where("prefix",$this->input->post("prefix"));
+                $tmpIndex = $this->db->get("t_index");
+
+                foreach($tmpIndex->result() as $tmp){
+                    $last = $tmp->last_index;
+                }
+                $last++;
+                if($last == 1){
+                    $tmpData["prefix"]  = $this->input->post("prefix");
+                    $tmpData["last_index"] = $last;
+                    $this->db->insert("t_index",$tmpData);
+                }else{
+                    $this->db->where("prefix",$this->input->post("prefix"));
+                    $tmpData["last_index"] = $last;
+                    $this->db->update("t_index",$tmpData);
+                }
+                if($last < 9){
+                    $data["nomor_anggota"] = $this->input->post("prefix").".10000".$last;
+                }else if($last < 99){
+                    $data["nomor_anggota"] = $this->input->post("prefix").".1000".$last;
+                }else if($last < 999){
+                    $data["nomor_anggota"] = $this->input->post("prefix").".100".$last;
+                }else if($last < 9999){
+                    $data["nomor_anggota"] = $this->input->post("prefix").".10".$last;
+                }else{
+                    $data["nomor_anggota"] = $this->input->post("prefix").".1".$last;
+                }
+            }else{
+                $data['nomor_anggota'] = $this->input->post('nomor_anggota');
+            }
+
+            $data["update_date"] = date("y-m-d");
+            $data["update_by"] = $this->session->username;
+            if(null !== $this->input->post('id')){
+                $this->db->where("id",$this->input->post("id"));
+                $this->db->update("m_anggota",$data);
+            }else{
+
+                $this->db->insert("m_anggota",$data);
+            }
         }else{
-            //die($this->upload->display_errors());
-        }
+                echo validation_errors();
 
-        $data["provinsi"] = $this->input->post("provinsi");
-        $data["kabupaten_kota"] = $this->input->post("kabupaten_kota");
-        $data["nama"] = $this->input->post("nama");
-        $data["tempat_lahir"] = $this->input->post("tempat_lahir");
-        $data["tanggal_lahir"] = $this->input->post("tanggal_lahir");
-        $data["nomor_nik"] = $this->input->post("nomor_nik");
-        $data["nomor_kta"] = $this->input->post("nomor_kta");
-        $data["jenis_kelamin"] = $this->input->post("jenis_kelamin");
-        $data["agama"] = $this->input->post("agama");
-        $data["alamat"] = $this->input->post("alamat");
-        $data["telp"] = $this->input->post("telp");
-        $data["email"] = $this->input->post("email");
-        $data["sm_fb"] = $this->input->post("sm_fb");
-        $data["sm_twitter"] = $this->input->post("sm_twitter");
-        $data["sm_instagram"] = $this->input->post("sm_instagram");
-        $data["status_perkawinan"] = $this->input->post("status_perkawinan");
-        $data["nama_istri"] = $this->input->post("nama_istri");
-        $data["mencalonkan"] = $this->input->post("mencalonkan");
-        $data["created_date"] = date('Y-m-d h:i:s');
-        $this->db->insert("tb_calon",$data);
-        $id = $this->db->insert_id();
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["tingkat"] = "SD";
-        $data["alamat"] = $this->input->post("SD_ALAMAT");
-        $data["tahun"] = $this->input->post("SD_YEAR");
-        $this->db->insert("tb_calon_pendidikan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["tingkat"] = "SMP";
-        $data["alamat"] = $this->input->post("SMP_ALAMAT");
-        $data["tahun"] = $this->input->post("SMP_YEAR");
-        $this->db->insert("tb_calon_pendidikan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["tingkat"] = "SMA";
-        $data["alamat"] = $this->input->post("SMA_ALAMAT");
-        $data["tahun"] = $this->input->post("SMA_YEAR");
-        $this->db->insert("tb_calon_pendidikan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["tingkat"] = "S1";
-        $data["alamat"] = $this->input->post("S1_ALAMAT");
-        $data["tahun"] = $this->input->post("S1_YEAR");
-        $this->db->insert("tb_calon_pendidikan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["tingkat"] = "S2";
-        $data["alamat"] = $this->input->post("S2_ALAMAT");
-        $data["tahun"] = $this->input->post("S2_YEAR");
-        $this->db->insert("tb_calon_pendidikan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["jenis_pelatihan"] = $this->input->post("jp_jenis_pelatihan1");
-        $data["instansi"] = $this->input->post("jp_instansi1");
-        $data["tahun"] = $this->input->post("jp_tahun1");
-        $this->db->insert("tb_calon_diklat",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["jenis_pelatihan"] = $this->input->post("jp_jenis_pelatihan2");
-        $data["instansi"] = $this->input->post("jp_instansi2");
-        $data["tahun"] = $this->input->post("jp_tahun2");
-        $this->db->insert("tb_calon_diklat",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["jenis_pelatihan"] = $this->input->post("jp_jenis_pelatihan3");
-        $data["instansi"] = $this->input->post("jp_instansi3");
-        $data["tahun"] = $this->input->post("jp_tahun3");
-        $this->db->insert("tb_calon_diklat",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["jenis_pelatihan"] = $this->input->post("jp_jenis_pelatihan4");
-        $data["instansi"] = $this->input->post("jp_instansi4");
-        $data["tahun"] = $this->input->post("jp_tahun4");
-        $this->db->insert("tb_calon_diklat",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["jenis_pelatihan"] = $this->input->post("jp_jenis_pelatihan5");
-        $data["instansi"] = $this->input->post("jp_instansi5");
-        $data["tahun"] = $this->input->post("jp_tahun5");
-        $this->db->insert("tb_calon_diklat",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["organisasi"] = $this->input->post("o_organisasi1");
-        $data["alamat"] = $this->input->post("o_alamat1");
-        $data["jabatan"] = $this->input->post("o_jabatan1");
-        $this->db->insert("tb_calon_organisasi",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["organisasi"] = $this->input->post("o_organisasi2");
-        $data["alamat"] = $this->input->post("o_alamat2");
-        $data["jabatan"] = $this->input->post("o_jabatan2");
-        $this->db->insert("tb_calon_organisasi",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["organisasi"] = $this->input->post("o_organisasi3");
-        $data["alamat"] = $this->input->post("o_alamat3");
-        $data["jabatan"] = $this->input->post("o_jabatan3");
-        $this->db->insert("tb_calon_organisasi",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["organisasi"] = $this->input->post("o_organisasi4");
-        $data["alamat"] = $this->input->post("o_alamat4");
-        $data["jabatan"] = $this->input->post("o_jabatan4");
-        $this->db->insert("tb_calon_organisasi",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["organisasi"] = $this->input->post("o_organisasi5");
-        $data["alamat"] = $this->input->post("o_alamat5");
-        $data["jabatan"] = $this->input->post("o_jabatan5");
-        $this->db->insert("tb_calon_organisasi",$data);
-
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["instansi"] = $this->input->post("p_instansi1");
-        $data["alamat"] = $this->input->post("p_alamat1");
-        $data["jabatan"] = $this->input->post("p_jabatan1");
-        $this->db->insert("tb_calon_pekerjaan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["instansi"] = $this->input->post("p_instansi2");
-        $data["alamat"] = $this->input->post("p_alamat2");
-        $data["jabatan"] = $this->input->post("p_jabatan2");
-        $this->db->insert("tb_calon_pekerjaan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["instansi"] = $this->input->post("p_instansi3");
-        $data["alamat"] = $this->input->post("p_alamat3");
-        $data["jabatan"] = $this->input->post("p_jabatan3");
-        $this->db->insert("tb_calon_pekerjaan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["instansi"] = $this->input->post("p_instansi4");
-        $data["alamat"] = $this->input->post("p_alamat4");
-        $data["jabatan"] = $this->input->post("p_jabatan4");
-        $this->db->insert("tb_calon_pekerjaan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["instansi"] = $this->input->post("p_instansi5");
-        $data["alamat"] = $this->input->post("p_alamat5");
-        $data["jabatan"] = $this->input->post("p_jabatan5");
-        $this->db->insert("tb_calon_pekerjaan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["penghargaan"] = $this->input->post("pe_penghargaan1");
-        $data["instansi"] = $this->input->post("pe_instansi1");
-        $data["tahun"] = $this->input->post("pe_tahun1");
-        $this->db->insert("tb_calon_penghargaan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["penghargaan"] = $this->input->post("pe_penghargaan2");
-        $data["instansi"] = $this->input->post("pe_instansi2");
-        $data["tahun"] = $this->input->post("pe_tahun2");
-        $this->db->insert("tb_calon_penghargaan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["penghargaan"] = $this->input->post("pe_penghargaan3");
-        $data["instansi"] = $this->input->post("pe_instansi3");
-        $data["tahun"] = $this->input->post("pe_tahun3");
-        $this->db->insert("tb_calon_penghargaan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["penghargaan"] = $this->input->post("pe_penghargaan4");
-        $data["instansi"] = $this->input->post("pe_instansi4");
-        $data["tahun"] = $this->input->post("pe_tahun4");
-        $this->db->insert("tb_calon_penghargaan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["penghargaan"] = $this->input->post("pe_penghargaan5");
-        $data["instansi"] = $this->input->post("pe_instansi5");
-        $data["tahun"] = $this->input->post("pe_tahun5");
-        $this->db->insert("tb_calon_penghargaan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["kegiatan"] = $this->input->post("k_kegiatan1");
-        $data["lokasi"] = $this->input->post("k_lokasi1");
-        $data["tahun"] = $this->input->post("k_tahun1");
-        $this->db->insert("tb_calon_sosial",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["kegiatan"] = $this->input->post("k_kegiatan2");
-        $data["lokasi"] = $this->input->post("k_lokasi2");
-        $data["tahun"] = $this->input->post("k_tahun2");
-        $this->db->insert("tb_calon_sosial",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["kegiatan"] = $this->input->post("k_kegiatan3");
-        $data["lokasi"] = $this->input->post("k_lokasi3");
-        $data["tahun"] = $this->input->post("k_tahun3");
-        $this->db->insert("tb_calon_sosial",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["kegiatan"] = $this->input->post("k_kegiatan4");
-        $data["lokasi"] = $this->input->post("k_lokasi4");
-        $data["tahun"] = $this->input->post("k_tahun4");
-        $this->db->insert("tb_calon_sosial",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["kegiatan"] = $this->input->post("k_kegiatan5");
-        $data["lokasi"] = $this->input->post("k_lokasi5");
-        $data["tahun"] = $this->input->post("k_tahun5");
-        $this->db->insert("tb_calon_sosial",$data);
-
-        $config['protocol']    = 'smtp';
-        $config['smtp_host']    = 'ssl://smtp.gmail.com';
-        $config['smtp_port']    = '465';
-        $config['smtp_timeout'] = '7';
-        $config['smtp_user']    = 'hanura2020@gmail.com';
-        $config['smtp_pass']    = 'Indonesia123';
-        $config['charset']    = 'utf-8';
-        $config['newline']    = "\r\n";
-        $config['mailtype'] = 'text'; // or html
-        $config['validation'] = TRUE; // bool whether to validate email or not
-
-        $this->email->initialize($config);
-        $this->email->from('hanura2020@gmail.com', 'Hanura');
-        $this->email->to($this->input->post("email"));
-        $this->email->cc('hanura2020@gmail.com');
-
-        $this->email->subject('Konfirmasi pendaftaran');
-        $this->email->message('Terimakasih bapak / ibu data akan di verifikasi oleh TPC terkait');
-
-        $this->email->send();
-        $this->load->view('success',$data);
+        } 
     }
-    public function save_tambah(){
-        $data["foto"] = $this->input->post("foto");
+     function save_ktp_add(){
+        $arr = [];
+        $config['upload_path'] = './foto/';
+        $config['allowed_types'] = 'gif|jpg|png';
+        $config['file_name'] = time()."_".$_FILES["file"]['name'];
 
-        $config['upload_path']          = './foto/';
-        $config['file_name']            = $this->input->post("nomor_nik");
-        $config['overwrite']			= true;
-        $config['allowed_types']        = 'gif|jpg|png';
-        // $config['max_width']            = 1024;
-        // $config['max_height']           = 768;
-        $this->load->library('upload', $config);
+        $this->load->library("upload", $config);
 
-        if ($this->upload->do_upload('foto')) {
-            $data["foto"] = $this->upload->data("file_name");
+        if(!$this->upload->do_upload('file')){
+            $arr['status'] = "failed";
+            $arr['message'] = $this->upload->display_errors();
         }else{
-            //die($this->upload->display_errors());
+            $data = $this->upload->data();
+            $arr['status'] = "success";
+            $arr['data'] = $data;
+            $arr['data']['fixed_file_name'] = "/foto/".$data['file_name'];
         }
 
+        echo json_encode($arr);
 
-        $data["provinsi"] = $this->input->post("provinsi");
-        $data["kabupaten_kota"] = $this->input->post("kabupaten_kota");
-        $data["nama"] = $this->input->post("nama");
-        $data["tempat_lahir"] = $this->input->post("tempat_lahir");
-        $data["tanggal_lahir"] = $this->input->post("tanggal_lahir");
-        $data["nomor_nik"] = $this->input->post("nomor_nik");
-        $data["nomor_kta"] = $this->input->post("nomor_kta");
-        $data["jenis_kelamin"] = $this->input->post("jenis_kelamin");
-        $data["agama"] = $this->input->post("agama");
-        $data["alamat"] = $this->input->post("alamat");
-        $data["telp"] = $this->input->post("telp");
-        $data["email"] = $this->input->post("email");
-        $data["sm_fb"] = $this->input->post("sm_fb");
-        $data["sm_twitter"] = $this->input->post("sm_twitter");
-        $data["sm_instagram"] = $this->input->post("sm_instagram");
-        $data["status_perkawinan"] = $this->input->post("status_perkawinan");
-        $data["nama_istri"] = $this->input->post("nama_istri");
-        $data["mencalonkan"] = $this->input->post("mencalonkan");
-        $data["created_by"] =  "TPP";
-        $data["created_date"] = date('Y-m-d h:i:s');
-        $this->db->insert("tb_calon",$data);
-        $id = $this->db->insert_id();
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["tingkat"] = "SD";
-        $data["alamat"] = $this->input->post("SD_ALAMAT");
-        $data["tahun"] = $this->input->post("SD_YEAR");
-        $this->db->insert("tb_calon_pendidikan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["tingkat"] = "SMP";
-        $data["alamat"] = $this->input->post("SMP_ALAMAT");
-        $data["tahun"] = $this->input->post("SMP_YEAR");
-        $this->db->insert("tb_calon_pendidikan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["tingkat"] = "SMA";
-        $data["alamat"] = $this->input->post("SMA_ALAMAT");
-        $data["tahun"] = $this->input->post("SMA_YEAR");
-        $this->db->insert("tb_calon_pendidikan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["tingkat"] = "S1";
-        $data["alamat"] = $this->input->post("S1_ALAMAT");
-        $data["tahun"] = $this->input->post("S1_YEAR");
-        $this->db->insert("tb_calon_pendidikan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["tingkat"] = "S2";
-        $data["alamat"] = $this->input->post("S2_ALAMAT");
-        $data["tahun"] = $this->input->post("S2_YEAR");
-        $this->db->insert("tb_calon_pendidikan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["jenis_pelatihan"] = $this->input->post("jp_jenis_pelatihan1");
-        $data["instansi"] = $this->input->post("jp_instansi1");
-        $data["tahun"] = $this->input->post("jp_tahun1");
-        $this->db->insert("tb_calon_diklat",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["jenis_pelatihan"] = $this->input->post("jp_jenis_pelatihan2");
-        $data["instansi"] = $this->input->post("jp_instansi2");
-        $data["tahun"] = $this->input->post("jp_tahun2");
-        $this->db->insert("tb_calon_diklat",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["jenis_pelatihan"] = $this->input->post("jp_jenis_pelatihan3");
-        $data["instansi"] = $this->input->post("jp_instansi3");
-        $data["tahun"] = $this->input->post("jp_tahun3");
-        $this->db->insert("tb_calon_diklat",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["jenis_pelatihan"] = $this->input->post("jp_jenis_pelatihan4");
-        $data["instansi"] = $this->input->post("jp_instansi4");
-        $data["tahun"] = $this->input->post("jp_tahun4");
-        $this->db->insert("tb_calon_diklat",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["jenis_pelatihan"] = $this->input->post("jp_jenis_pelatihan5");
-        $data["instansi"] = $this->input->post("jp_instansi5");
-        $data["tahun"] = $this->input->post("jp_tahun5");
-        $this->db->insert("tb_calon_diklat",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["organisasi"] = $this->input->post("o_organisasi1");
-        $data["alamat"] = $this->input->post("o_alamat1");
-        $data["jabatan"] = $this->input->post("o_jabatan1");
-        $this->db->insert("tb_calon_organisasi",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["organisasi"] = $this->input->post("o_organisasi2");
-        $data["alamat"] = $this->input->post("o_alamat2");
-        $data["jabatan"] = $this->input->post("o_jabatan2");
-        $this->db->insert("tb_calon_organisasi",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["organisasi"] = $this->input->post("o_organisasi3");
-        $data["alamat"] = $this->input->post("o_alamat3");
-        $data["jabatan"] = $this->input->post("o_jabatan3");
-        $this->db->insert("tb_calon_organisasi",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["organisasi"] = $this->input->post("o_organisasi4");
-        $data["alamat"] = $this->input->post("o_alamat4");
-        $data["jabatan"] = $this->input->post("o_jabatan4");
-        $this->db->insert("tb_calon_organisasi",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["organisasi"] = $this->input->post("o_organisasi5");
-        $data["alamat"] = $this->input->post("o_alamat5");
-        $data["jabatan"] = $this->input->post("o_jabatan5");
-        $this->db->insert("tb_calon_organisasi",$data);
-
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["instansi"] = $this->input->post("p_instansi1");
-        $data["alamat"] = $this->input->post("p_alamat1");
-        $data["jabatan"] = $this->input->post("p_jabatan1");
-        $this->db->insert("tb_calon_pekerjaan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["instansi"] = $this->input->post("p_instansi2");
-        $data["alamat"] = $this->input->post("p_alamat2");
-        $data["jabatan"] = $this->input->post("p_jabatan2");
-        $this->db->insert("tb_calon_pekerjaan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["instansi"] = $this->input->post("p_instansi3");
-        $data["alamat"] = $this->input->post("p_alamat3");
-        $data["jabatan"] = $this->input->post("p_jabatan3");
-        $this->db->insert("tb_calon_pekerjaan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["instansi"] = $this->input->post("p_instansi4");
-        $data["alamat"] = $this->input->post("p_alamat4");
-        $data["jabatan"] = $this->input->post("p_jabatan4");
-        $this->db->insert("tb_calon_pekerjaan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["instansi"] = $this->input->post("p_instansi5");
-        $data["alamat"] = $this->input->post("p_alamat5");
-        $data["jabatan"] = $this->input->post("p_jabatan5");
-        $this->db->insert("tb_calon_pekerjaan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["penghargaan"] = $this->input->post("pe_penghargaan1");
-        $data["instansi"] = $this->input->post("pe_instansi1");
-        $data["tahun"] = $this->input->post("pe_tahun1");
-        $this->db->insert("tb_calon_penghargaan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["penghargaan"] = $this->input->post("pe_penghargaan2");
-        $data["instansi"] = $this->input->post("pe_instansi2");
-        $data["tahun"] = $this->input->post("pe_tahun2");
-        $this->db->insert("tb_calon_penghargaan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["penghargaan"] = $this->input->post("pe_penghargaan3");
-        $data["instansi"] = $this->input->post("pe_instansi3");
-        $data["tahun"] = $this->input->post("pe_tahun3");
-        $this->db->insert("tb_calon_penghargaan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["penghargaan"] = $this->input->post("pe_penghargaan4");
-        $data["instansi"] = $this->input->post("pe_instansi4");
-        $data["tahun"] = $this->input->post("pe_tahun4");
-        $this->db->insert("tb_calon_penghargaan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["penghargaan"] = $this->input->post("pe_penghargaan5");
-        $data["instansi"] = $this->input->post("pe_instansi5");
-        $data["tahun"] = $this->input->post("pe_tahun5");
-        $this->db->insert("tb_calon_penghargaan",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["kegiatan"] = $this->input->post("k_kegiatan1");
-        $data["lokasi"] = $this->input->post("k_lokasi1");
-        $data["tahun"] = $this->input->post("k_tahun1");
-        $this->db->insert("tb_calon_sosial",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["kegiatan"] = $this->input->post("k_kegiatan2");
-        $data["lokasi"] = $this->input->post("k_lokasi2");
-        $data["tahun"] = $this->input->post("k_tahun2");
-        $this->db->insert("tb_calon_sosial",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["kegiatan"] = $this->input->post("k_kegiatan3");
-        $data["lokasi"] = $this->input->post("k_lokasi3");
-        $data["tahun"] = $this->input->post("k_tahun3");
-        $this->db->insert("tb_calon_sosial",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["kegiatan"] = $this->input->post("k_kegiatan4");
-        $data["lokasi"] = $this->input->post("k_lokasi4");
-        $data["tahun"] = $this->input->post("k_tahun4");
-        $this->db->insert("tb_calon_sosial",$data);
-
-        $data = array();
-        $data["id_calon"] = $id;
-        $data["kegiatan"] = $this->input->post("k_kegiatan5");
-        $data["lokasi"] = $this->input->post("k_lokasi5");
-        $data["tahun"] = $this->input->post("k_tahun5");
-        $this->db->insert("tb_calon_sosial",$data);
-
-        $data = array();
-        $data["prov"] = $this->db->query("select distinct m_geo_prov_kpu.* from m_geo_prov_kpu inner join tb_grade on tb_grade.geo_prov_id = m_geo_prov_kpu.geo_prov_id");
-        $this->load->view('tambah_calon',$data);
-    }
-
-    function kabupaten(){
-        $provinsi = $this->input->post("provinsi");
-        $this->db->where("geo_prov_id",$provinsi);
-        $query = $this->db->get("m_geo_kab_kpu");
-        echo '<option value="">ALL </option>';
-        foreach($query->result() as $tmp){
-            echo "<option value='".$tmp->geo_kab_id."'>".$tmp->geo_kab_nama."</option>";
-        }
-    }
-    function kabupaten_pemilihan(){
-        $provinsi = $this->input->post("provinsi");
-				$query = $this->db->query("select m_geo_kab_kpu.* from m_geo_kab_kpu inner join tb_grade on tb_grade.geo_kab_id = m_geo_kab_kpu.geo_kab_id where m_geo_kab_kpu.geo_prov_id = '".$provinsi."'");
-        echo '<option value="">ALL </option>';
-        foreach($query->result() as $tmp){
-            echo "<option value='".$tmp->geo_kab_id."'>".$tmp->geo_kab_nama."</option>";
-        }
-    }
-    function upload(){
-        $base64Image = $this->input->post("image");
-        $filename = $this->input->post("name");
-        $decoded=base64_decode($base64Image);
-        //file_put_contents($filename,$decoded);
-        //echo FCPATH."/foto/".$filename;
-        file_put_contents(FCPATH."foto/".$filename,$decoded);
     }
 }
+

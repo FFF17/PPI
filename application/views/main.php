@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>HANURA KTA</title>
+    <title>PPI</title>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
@@ -23,10 +23,10 @@
         <div class="sidebar" data-color="azure" data-background-color="black" data-image="http://hanura2020.com/registrasi/wp-content/uploads/2019/11/IMG_0421.jpg">
             <div class="logo">
                 <a class="simple-text logo-mini">
-                    <img src="<?php echo base_url() ?>assets/img/cropped_hanura.png" width="30px" />
+                    <img src="<?php echo base_url() ?>assets/img/PPI.png" width="30px" />
                 </a>
                 <a class="simple-text logo-normal">
-                    HANURA2020
+                    PPI
                 </a>
             </div>
             <div class="sidebar-wrapper">
@@ -44,17 +44,113 @@
                     <!-- End informasi User -->
                 </div>
                 <ul class="nav">
-                    <li class="nav-item" name="menu" id="dashboard" onclick="selectMenu(this.id);goMenu('Dashboard','dashboard/admin')">
+                    <li class="nav-item" name="menu" id="dashboard" onclick="selectMenu(this.id)" style="<?php echo isset($menu["dashboard"])?"":"display:none";?>">
                         <a class="nav-link" href="#0">
                             <i class="material-icons text-primary">dashboard</i>
                             <p>DASHBOARD</p>
                         </a>
                     </li>
-                    <li class="nav-item" name="menu" id="anggota_new" onclick="selectMenu(this.id);goMenu('Anggota Baru','anggota/baru')">
-                        <a class="nav-link" href="#0">
-                            <i class="material-icons text-primary">account_circle</i>
-                            <p>ANGGOTA</p>
+                    <li class="nav-item" name="menu" id="anggota" style="<?php echo isset($menu["anggota"])?"":"display:none";?>">
+                        <a class="nav-link" data-toggle="collapse" href="#menuCalon" aria-expanded="false">
+                            <i class="material-icons text-info">folder</i>
+                            <p>Anggota<b class="caret"></b></p>
                         </a>
+                        <div class="collapse" id="menuCalon">
+                            <ul class="nav">
+                                <li class="nav-item" name="menu" id="anggota_new" onclick="selectMenu(this.id);goMenu('Anggota Baru','anggota/baru')" style="<?php echo isset($menu["anggota_new"])?"":"display:none";?>">
+                                    <a class="nav-link" href="#">
+                                        <span class="sidebar-mini"><i class="material-icons text-success">account_circle</i> </span>
+                                        <span class="sidebar-normal">BARU</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item" name="menu" id="anggota_list" onclick="selectMenu(this.id);goMenu('Daftar Anggota','anggota/list_data')" style="<?php echo isset($menu["anggota_list"])?"":"display:none";?>">
+                                    <a class="nav-link" href="#">
+                                        <span class="sidebar-mini"><i class="material-icons text-success">account_circle</i> </span>
+                                        <span class="sidebar-normal">LIST</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item" name="menu" id="anggota_jabatan" onclick="selectMenu(this.id);goMenu('Jabatan','anggota/jabatan')" style="<?php echo isset($menu["anggota_jabatan"])?"":"display:none";?>">
+                                    <a class="nav-link" href="#">
+                                        <span class="sidebar-mini"><i class="material-icons text-success">account_circle</i> </span>
+                                        <span class="sidebar-normal">SET JABATAN</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item" name="menu" id="anggota_berita" onclick="selectMenu(this.id);goMenu('Daftar Berita','berita')" style="<?php echo isset($menu["anggota_berita"])?"":"display:none";?>">
+                                    <a class="nav-link" href="#">
+                                        <span class="sidebar-mini"><i class="material-icons text-success">account_circle</i> </span>
+                                        <span class="sidebar-normal">BERITA DAERAH</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>                    
+                    <li class="nav-item" name="menu" style="<?php echo ($menu["kebenduman"])?"":"display:none";?> id="kebenduman">
+                        <a class="nav-link" data-toggle="collapse" href="#menuKebenduman" aria-expanded="false">
+                            <i class="material-icons text-info">folder</i>
+                            <p>Kebenduman<b class="caret"></b></p>
+                        </a>
+                        <div class="collapse" id="menuKebenduman">
+                            <ul class="nav">
+                                <li class="nav-item" name="menu" style="<?php echo isset($menu["kebenduman_dashboard"])?"":"display:none";?>" id="kebenduman_dashboard" onclick="selectMenu(this.id);goMenu('Input Iuran','kebenduman/dashboard')">
+                                    <a class="nav-link" href="#">
+                                        <span class="sidebar-mini"><i class="material-icons text-success">dashboard</i> </span>
+                                        <span class="sidebar-normal">Dashboard</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item" name="menu" style="<?php echo isset($menu["kebenduman_iuran"])?"":"display:none";?>" id="kebenduman_iuran" onclick="selectMenu(this.id);goMenu('Input Iuran','kebenduman/iuran')">
+                                    <a class="nav-link" href="#">
+                                        <span class="sidebar-mini"><i class="material-icons text-success">playlist_add</i> </span>
+                                        <span class="sidebar-normal">Iuran Anggota</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item" name="menu" style="<?php echo isset($menu["kebenduman_konfirmasi"])?"":"display:none";?>" id="kebenduman_konfirmasi" onclick="selectMenu(this.id);goMenu('Rekonsiliasi','kebenduman/iuran_reconcile')">
+                                    <a class="nav-link" href="#">
+                                        <span class="sidebar-mini"><i class="material-icons text-success">playlist_add_check</i> </span>
+                                        <span class="sidebar-normal">Rekonsiliasi</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item" name="menu" style="<?php echo isset($menu["kebenduman_kas"])?"":"display:none";?>" id="kebenduman_kas" onclick="selectMenu(this.id);goMenu('Kas Organisasi','kebenduman/cash_flow')">
+                                    <a class="nav-link" href="#">
+                                        <span class="sidebar-mini"><i class="material-icons text-success">list</i> </span>
+                                        <span class="sidebar-normal">Kas Organisasi</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item" name="menu" style="<?php echo isset($menu["kebenduman_master"])?"":"display:none";?>" id="kebenduman_master" onclick="selectMenu(this.id);goMenu('Master Data','kebenduman/master')">
+                                    <a class="nav-link" href="#">
+                                        <span class="sidebar-mini"><i class="material-icons text-success">list</i> </span>
+                                        <span class="sidebar-normal">Jumlah Iuran</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="nav-item" name="menu" id="master" style="<?php echo isset($menu["master"])?"":"display:none";?>">
+                        <a class="nav-link" data-toggle="collapse" href="#menuMaster" aria-expanded="false">
+                            <i class="material-icons text-info">folder</i>
+                            <p>Master Data<b class="caret"></b></p>
+                        </a>
+                        <div class="collapse" id="menuMaster">
+                            <ul class="nav">
+                                <li class="nav-item" name="menu" id="master_kegiatan" onclick="selectMenu(this.id);goMenu('Kegiatan','event')" style="<?php echo isset($menu["master_kegiatan"])?"":"display:none";?>">
+                                    <a class="nav-link" href="#">
+                                        <span class="sidebar-mini"><i class="material-icons text-success">account_circle</i> </span>
+                                        <span class="sidebar-normal">Kegiatan</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item" name="menu" id="master_jabatan" onclick="selectMenu(this.id);goMenu('Jabatan','jabatan')" style="<?php echo isset($menu["master_jabatan"])?"":"display:none";?>">
+                                    <a class="nav-link" href="#">
+                                        <span class="sidebar-mini"><i class="material-icons text-success">account_circle</i> </span>
+                                        <span class="sidebar-normal">Jabatan</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item" name="menu" id="master_gedung" onclick="selectMenu(this.id);goMenu('Kantor','lokasi')" style="<?php echo isset($menu["master_gedung"])?"":"display:none";?>">
+                                    <a class="nav-link" href="#">
+                                        <span class="sidebar-mini"><i class="material-icons text-success">account_circle</i> </span>
+                                        <span class="sidebar-normal">Kantor</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </li>
                     <li class="nav-item" name="menu" id="logout" onclick="selectMenu(this.id);logout()">
                         <a class="nav-link" href="#0">
@@ -111,7 +207,7 @@
     </div>
 </body>
 <!--   Core JS Files   -->
-<script src="<?php echo base_url() ?>assets/js/core/jquery.min.js" type="text/javascript"></script>
+       <script src="<?php echo base_url() ?>assets/js/core/jquery.min.js" type="text/javascript"></script>
 <script src="<?php echo base_url() ?>assets/js/core/popper.min.js" type="text/javascript"></script>
 <script src="<?php echo base_url() ?>assets/js/core/bootstrap-material-design.min.js" type="text/javascript"></script>
 
@@ -130,7 +226,7 @@
 <!--  Plugin for the Wizard, full documentation here: https://github.com/VinceG/twitter-bootstrap-wizard -->
 <script src="<?php echo base_url() ?>assets/js/plugins/jquery.bootstrap-wizard.js"></script>
 
-<!--	Plugin for Select, full documentation here: http://silviomoreto.github.io/bootstrap-select -->
+<!--    Plugin for Select, full documentation here: http://silviomoreto.github.io/bootstrap-select -->
 <script src="<?php echo base_url() ?>assets/js/plugins/bootstrap-selectpicker.js"></script>
 
 <!--  Plugin for the DateTimePicker, full documentation here: https://eonasdan.github.io/bootstrap-datetimepicker/ -->
@@ -138,9 +234,9 @@
 
 <!--  DataTables.net Plugin, full documentation here: https://datatables.net/    -->
 <script src="<?php echo base_url() ?>assets/js/plugins/jquery.dataTables.min.js"></script>
-<script src="<?php echo base_url() ?>assets/js/plugins/Buttons-1.5.4/js/dataTables.buttons.js"></script>
+<!-- <script src="<?php echo base_url() ?>assets/js/plugins/Buttons-1.5.4/js/dataTables.buttons.js"></script> -->
 
-<!--	Plugin for Tags, full documentation here: https://github.com/bootstrap-tagsinput/bootstrap-tagsinputs  -->
+<!--    Plugin for Tags, full documentation here: https://github.com/bootstrap-tagsinput/bootstrap-tagsinputs  -->
 <script src="<?php echo base_url() ?>assets/js/plugins/bootstrap-tagsinput.js"></script>
 
 <!-- Plugin for Fileupload, full documentation here: http://www.jasny.net/bootstrap/javascript/#fileinput -->
@@ -162,7 +258,7 @@
 <script src="<?php echo base_url() ?>assets/js/plugins/arrive.min.js"></script>
 
 <!--  Google Maps Plugin    -->
-<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script>
+<!-- <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script> -->
 
 <!-- Chartist JS -->
 <script src="<?php echo base_url() ?>assets/js/plugins/chartist.min.js"></script>
@@ -172,16 +268,8 @@
 
 <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
 <script src="<?php echo base_url() ?>assets/js/material-dashboard.js?v=2.1.1" type="text/javascript"></script>
+<script src="<?php echo base_url() ?>assets/js/plugins/select2/dist/js/select2.full.min.js"></script>
 
-<script src="<?php echo base_url() ?>assets/js/plugins/select2/dist/js/select2.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/echarts-stat/dist/ecStat.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/dataTool.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/echarts/map/js/world.js"></script>
-<!-- <script src="https://api.map.baidu.com/api?v=2.0&ak=xfhhaTThl11qYVrqLZii6w8qE5ggnhrY&__ec_v__=20190126"></script> -->
-<script src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/bmap.min.js"></script>
 <script>
     $(function() {
         <?php if ($this->session->page != "") : ?>
